@@ -1,0 +1,27 @@
+{
+  "name": "literate-hexa-computing-machine-server",
+  "version": "0.0.1",
+  "description": "Server back end for rolling a die, getting letters, and placing letters.",
+  "main": "./src/server.ts",
+  "scripts": {
+    "start": "tsc && node ./dist/server.js",
+    "dev": "tsc-watch --outDir ./dist --onSuccess \"npm run start\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spoke-software/literate-hexa-computing-machine.git"
+  },
+  "author": "JaWS",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/spoke-software/literate-hexa-computing-machine/issues"
+  },
+  "homepage": "https://github.com/spoke-software/literate-hexa-computing-machine#readme",
+  "devDependencies": {
+    "@types/ws": "^3.0.2",
+    "tsc-watch": "^1.0.7",
+    "typescript": "^2.4.2",
+    "ws": "^3.0.0"
+  }
+}
