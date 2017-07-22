@@ -1,243 +1,173 @@
-<!-- 
+<!--
     Unabashedly stole the template of this code from http://www.websocket.org/echo.html
-    To be fair it actually told me to. 
+    To be fair it actually told me to.
     I then may have destroyed it a lot with hardcoded repitition everywhere
     but it's ok because it's just a dev tool... right guys? right?
 -->
 
-<!-- 
-    I wrote this file like a year ago, and I can't be bothered to rewrite it cleanly :P 
+<!--
+    I wrote this file like a year ago, and I can't be bothered to rewrite it cleanly :P
     If someone wants to take a crack at it, feel free. Else I'll clean it up by the time we get to
     actually writing the back end, promise :D
 -->
 
 <!DOCTYPE html>
-<meta charset="utf-8" />
-<title>WebSocket Test</title>
-<script language="javascript" type="text/javascript">
-    var wsUri = "ws://localhost:3001/";
-    var outputLeft, outputRight, outputCenterL, outputCenterR;
-    var rwebsocket, lwebsocket, crwebsocket, clwebsocket;
-    var connected = false;
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>WebSocket Test</title>
 
-    function init() {
-        outputLeft = document.getElementById("outputLeft");
-        document.getElementById("conbutLeft").onclick = open.bind(null, "Left");
-        document.getElementById("dconbutLeft").onclick = close.bind(null, "Left");
-        document.getElementById("msgbutLeft").onclick = sendmsg.bind(null, "Left");
-        document.getElementById("connectLeft").disabled = false;
-        document.getElementById("conbutLeft").disabled = false;
-        document.getElementById("msgLeft").disabled = true;
-        document.getElementById("msgbutLeft").disabled = true;
-        document.getElementById("dconbutLeft").disabled = true;
-        document.getElementById("clearLeft").onclick = clear.bind(outputLeft);
+    <style type="text/css">
+     .left { float: left; }
+     .right { float: right; }
+    </style>
+</head>
+<body>
+    <h2>WebSocket Test</h2>
 
-        outputRight = document.getElementById("outputRight");
-        document.getElementById("conbutRight").onclick = open.bind(null, "Right");
-        document.getElementById("dconbutRight").onclick = close.bind(null, "Right");
-        document.getElementById("msgbutRight").onclick = sendmsg.bind(null, "Right");
-        document.getElementById("connectRight").disabled = false;
-        document.getElementById("conbutRight").disabled = false;
-        document.getElementById("msgRight").disabled = true;
-        document.getElementById("msgbutRight").disabled = true;
-        document.getElementById("dconbutRight").disabled = true;
-        document.getElementById("clearRight").onclick = clear.bind(outputRight);
+    <div id="outputLeft" class="left">
+        <h2>Client A</h2>
+        <button type="button" id="conbutLeft">Connect</button>
+        <input id="connectLeft" placeholder="Override Default Server"></input>
+        <br>
+        <button type="button" id="dconbutLeft">Disconnect</button>
+        <br>
+        <button type="button" id="msgbutLeft">Send Message</button>
+        <input id="msgLeft" placeholder="Message goes here"></input>
+        <br>
+        <button type="button" id="clearLeft">Clear</button>
+    </div>
+    <div id="outputCenterLeft" class="left">
+        <h2>Client B</h2>
+        <button type="button" id="conbutCenterLeft">Connect</button>
+        <input id="connectCenterLeft" placeholder="Override Default Server"></input>
+        <br>
+        <button type="button" id="dconbutCenterLeft">Disconnect</button>
+        <br>
+        <button type="button" id="msgbutCenterLeft">Send Message</button>
+        <input id="msgCenterLeft" placeholder="Message goes here"></input>
+        <br>
+        <button type="button" id="clearCenterLeft">Clear</button>
+    </div>
+    <div id="outputCenterRight" class="right">
+        <h2>Client C</h2>
+        <button type="button" id="conbutCenterRight">Connect</button>
+        <input id="connectCenterRight" placeholder="Override Default Server"></input>
+        <br>
+        <button type="button" id="dconbutCenterRight">Disconnect</button>
+        <br>
+        <button type="button" id="msgbutCenterRight">Send Message</button>
+        <input id="msgCenterRight" placeholder="Message goes here"></input>
+        <br>
+        <button type="button" id="clearCenterRight">Clear</button>
+    </div>
+    <div id="outputRight" class="right">
+        <h2>Client D</h2>
+        <button type="button" id="conbutRight">Connect</button>
+        <input id="connectRight" placeholder="Override Default Server"></input>
+        <br>
+        <button type="button" id="dconbutRight">Disconnect</button>
+        <br>
+        <button type="button" id="msgbutRight">Send Message</button>
+        <input id="msgRight" placeholder="Message goes here"></input>
+        <br>
+        <button type="button" id="clearRight">Clear</button>
+    </div>
 
-        outputCenterR = document.getElementById("outputCenterR");
-        document.getElementById("conbutCenterR").onclick = open.bind(null, "CenterR");
-        document.getElementById("dconbutCenterR").onclick = close.bind(null, "CenterR");
-        document.getElementById("msgbutCenterR").onclick = sendmsg.bind(null, "CenterR");
-        document.getElementById("connectCenterR").disabled = false;
-        document.getElementById("conbutCenterR").disabled = false;
-        document.getElementById("msgCenterR").disabled = true;
-        document.getElementById("msgbutCenterR").disabled = true;
-        document.getElementById("dconbutCenterR").disabled = true;
-        document.getElementById("clearCenterR").onclick = clear.bind(outputCenterR);
+    <script language="javascript" type="text/javascript">
+        var wsUri = "ws://localhost:3001/";
+        var sides = ["Left", "CenterLeft", "CenterRight", "Right"];
+        var websockets = {};
+        var connected = false;
 
-        outputCenterL = document.getElementById("outputCenterL");
-        document.getElementById("conbutCenterL").onclick = open.bind(null, "CenterL");
-        document.getElementById("dconbutCenterL").onclick = close.bind(null, "CenterL");
-        document.getElementById("msgbutCenterL").onclick = sendmsg.bind(null, "CenterL");
-        document.getElementById("connectCenterL").disabled = false;
-        document.getElementById("conbutCenterL").disabled = false;
-        document.getElementById("msgCenterL").disabled = true;
-        document.getElementById("msgbutCenterL").disabled = true;
-        document.getElementById("dconbutCenterL").disabled = true;
-        document.getElementById("clearCenterL").onclick = clear.bind(outputCenterL);
-    }
-
-    function clear(side) {
-        for (var i = this.childNodes.length - 1; i >= 0; i--) {
-            var elem = this.childNodes[i];
-            if (elem.nodeName === "PRE")
-                this.removeChild(elem);
-        };
-    }
-
-    function open(side) {
-        var uri = document.getElementById("connect" + side).value || wsUri;
-        try {
-            if (side === "Left") {
-                lwebsocket = new WebSocket(uri);
-                lwebsocket.onopen = function (evt) { onOpen(evt, side) };
-                lwebsocket.onclose = function (evt) { onClose(evt, side) };
-                lwebsocket.onmessage = function (evt) { onMessage(evt, side) };
-                lwebsocket.onerror = function (evt) { onError(evt, side) };
+        function init() {
+            for (let side of sides) {
+                document.getElementById("conbut" + side).onclick = open.bind(null, side);
+                document.getElementById("dconbut" + side).onclick = close.bind(null, side);
+                document.getElementById("msgbut" + side).onclick = sendmsg.bind(null, side);
+                document.getElementById("connect" + side).disabled = false;
+                document.getElementById("conbut" + side).disabled = false;
+                document.getElementById("msg" + side).disabled = true;
+                document.getElementById("msgbut" + side).disabled = true;
+                document.getElementById("dconbut" + side).disabled = true;
+                document.getElementById("clear" + side).onclick = clear.bind(document.getElementById("output" + side));
             }
-            else if (side === "Right") {
-                rwebsocket = new WebSocket(uri);
-                rwebsocket.onopen = function (evt) { onOpen(evt, side) };
-                rwebsocket.onclose = function (evt) { onClose(evt, side) };
-                rwebsocket.onmessage = function (evt) { onMessage(evt, side) };
-                rwebsocket.onerror = function (evt) { onError(evt, side) };
-            }
-            else if (side === "CenterL") {
-                clwebsocket = new WebSocket(uri);
-                clwebsocket.onopen = function (evt) { onOpen(evt, side) };
-                clwebsocket.onclose = function (evt) { onClose(evt, side) };
-                clwebsocket.onmessage = function (evt) { onMessage(evt, side) };
-                clwebsocket.onerror = function (evt) { onError(evt, side) };
-            }
-            else if (side === "CenterR") {
-                crwebsocket = new WebSocket(uri);
-                crwebsocket.onopen = function (evt) { onOpen(evt, side) };
-                crwebsocket.onclose = function (evt) { onClose(evt, side) };
-                crwebsocket.onmessage = function (evt) { onMessage(evt, side) };
-                crwebsocket.onerror = function (evt) { onError(evt, side) };
-            }
-        } catch (e) { onError({ data: e }) };
-
-        document.getElementById("connect" + side).disabled = true;
-        document.getElementById("conbut" + side).disabled = true;
-        document.getElementById("dconbut" + side).disabled = false;
-        document.getElementById("msg" + side).disabled = false;
-        document.getElementById("msgbut" + side).disabled = false;
-    }
-
-    function close(side) {
-        if (side === "Left") lwebsocket.close();
-        else if (side === "Right") rwebsocket.close();
-        else if (side === "CenterR") crwebsocket.close();
-        else if (side === "CenterL") clwebsocket.close();
-
-        document.getElementById("connect" + side).disabled = false;
-        document.getElementById("conbut" + side).disabled = false;
-        document.getElementById("msg" + side).disabled = true;
-        document.getElementById("msg" + side).disabled = true;
-        document.getElementById("msgbut" + side).disabled = true;
-        document.getElementById("dconbut" + side).disabled = true;
-    }
-
-    function onOpen(evt, side) {
-        connected = true;
-        writeToScreen("CONNECTED: " + wsUri, null, side);
-    }
-
-    function onClose(evt, side) {
-        connected = false;
-        writeToScreen("DISCONNECTED: " + wsUri, null, side);
-    }
-
-    function onMessage(evt, side) {
-        writeToScreen('<span style="color: blue;">RESPONSE: </span>', evt.data, side);
-    }
-
-    function onError(evt, side) {
-        writeToScreen('<span style="color: red;">ERROR:</span> ', evt.data, side);
-    }
-
-    function sendmsg(side) {
-        var message = document.getElementById("msg" + side).value;
-        writeToScreen("SENT: ", message, side);
-        if (side === "Left") lwebsocket.send(message);
-        else if (side === "Right") rwebsocket.send(message);
-        else if (side === "CenterR") crwebsocket.send(message);
-        else if (side === "CenterL") clwebsocket.send(message);
-    }
-
-    function writeToScreen(stat, message, side) {
-        var pre = document.createElement("pre");
-        pre.style.wordWrap = "break-word";
-        console.log(message);
-        try {
-            message = message == null ? "" : JSON.stringify(JSON.parse(message), null, 3);
-        } catch (e) {
-            console.log(e);
         }
-        pre.innerHTML = stat + message;
-        document.getElementById("output" + side).appendChild(pre);
-    }
 
-    window.addEventListener("load", init, false);
+        function clear(side) {
+            for (var i = this.childNodes.length - 1; i >= 0; i--) {
+                var elem = this.childNodes[i];
+                if (elem.nodeName === "PRE")
+                    this.removeChild(elem);
+            };
+        }
 
-</script>
+        function open(side) {
+            var uri = document.getElementById("connect" + side).value || wsUri;
+            try {
+                websockets[side] = new WebSocket(uri);
+                websockets[side].onopen = function (evt) { onOpen(evt, side) };
+                websockets[side].onclose = function (evt) { onClose(evt, side) };
+                websockets[side].onmessage = function (evt) { onMessage(evt, side) };
+                websockets[side].onerror = function (evt) { onError(evt, side) };
+            } catch (e) { onError({ data: e }) };
 
-<h2>WebSocket Test</h2>
+            document.getElementById("connect" + side).disabled = true;
+            document.getElementById("conbut" + side).disabled = true;
+            document.getElementById("dconbut" + side).disabled = false;
+            document.getElementById("msg" + side).disabled = false;
+            document.getElementById("msgbut" + side).disabled = false;
+        }
 
+        function close(side) {
+            websockets[side].close();
 
-<div id="outputLeft">
-    <h2>Client A</h2>
-    <button type="button" id="conbutLeft">Connect</button>
-    <input id="connectLeft" placeholder="Override Default Server"></input>
-    <br>
-    <button type="button" id="dconbutLeft">Disconnect</button>
-    <br>
-    <button type="button" id="msgbutLeft">Send Message</button>
-    <input id="msgLeft" placeholder="Message goes here"></input>
-    <br>
-    <button type="button" id="clearLeft">Clear</button>
-</div>
-<div id="outputCenterL">
-    <h2>Client B</h2>
-    <button type="button" id="conbutCenterL">Connect</button>
-    <input id="connectCenterL" placeholder="Override Default Server"></input>
-    <br>
-    <button type="button" id="dconbutCenterL">Disconnect</button>
-    <br>
-    <button type="button" id="msgbutCenterL">Send Message</button>
-    <input id="msgCenterL" placeholder="Message goes here"></input>
-    <br>
-    <button type="button" id="clearCenterL">Clear</button>
-</div>
-<div id="outputRight">
-    <h2>Client D</h2>
-    <button type="button" id="conbutRight">Connect</button>
-    <input id="connectRight" placeholder="Override Default Server"></input>
-    <br>
-    <button type="button" id="dconbutRight">Disconnect</button>
-    <br>
-    <button type="button" id="msgbutRight">Send Message</button>
-    <input id="msgRight" placeholder="Message goes here"></input>
-    <br>
-    <button type="button" id="clearRight">Clear</button>
-</div>
-<div id="outputCenterR">
-    <h2>Client C</h2>
-    <button type="button" id="conbutCenterR">Connect</button>
-    <input id="connectCenterR" placeholder="Override Default Server"></input>
-    <br>
-    <button type="button" id="dconbutCenterR">Disconnect</button>
-    <br>
-    <button type="button" id="msgbutCenterR">Send Message</button>
-    <input id="msgCenterR" placeholder="Message goes here"></input>
-    <br>
-    <button type="button" id="clearCenterR">Clear</button>
-</div>
+            document.getElementById("connect" + side).disabled = false;
+            document.getElementById("conbut" + side).disabled = false;
+            document.getElementById("msg" + side).disabled = true;
+            document.getElementById("msg" + side).disabled = true;
+            document.getElementById("msgbut" + side).disabled = true;
+            document.getElementById("dconbut" + side).disabled = true;
+        }
 
-<style type="text/css">
-    #outputLeft {
-        float: left;
-    }
+        function onOpen(evt, side) {
+            connected = true;
+            writeToScreen("CONNECTED: " + wsUri, null, side);
+        }
 
-    #outputCenterL {
-        float: left;
-    }
+        function onClose(evt, side) {
+            connected = false;
+            writeToScreen("DISCONNECTED: " + wsUri, null, side);
+        }
 
-    #outputRight {
-        float: right;
-    }
+        function onMessage(evt, side) {
+            writeToScreen('<span style="color: blue;">RESPONSE: </span>', evt.data, side);
+        }
 
-    #outputCenterR {
-        float: right;
-    }
-</style>
+        function onError(evt, side) {
+            writeToScreen('<span style="color: red;">ERROR:</span> ', evt.data, side);
+        }
+
+        function sendmsg(side) {
+            var message = document.getElementById("msg" + side).value;
+            writeToScreen("SENT: ", message, side);
+            websockets[side].send(message);
+        }
+
+        function writeToScreen(stat, message, side) {
+            var pre = document.createElement("pre");
+            pre.style.wordWrap = "break-word";
+            console.log(message);
+            try {
+                message = message == null ? "" : JSON.stringify(JSON.parse(message), null, 3);
+            } catch (e) {
+                console.log(e);
+            }
+            pre.innerHTML = stat + message;
+            document.getElementById("output" + side).appendChild(pre);
+        }
+
+        window.addEventListener("load", init, false);
+    </script>
+</body>
+</html>
