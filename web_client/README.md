@@ -6,7 +6,7 @@ Currently this is just the "Hello, World!" app from [this tutorial](https://www.
 
 ## Setting up
 
-Make sure you have webpack installed globally:
+Make sure you have Webpack installed globally:
 ```
 npm install -g webpack
 ```
@@ -15,6 +15,17 @@ Run this in the `web_client` directory to populate `node_modules/` with sweet, s
 ```
 npm install
 ```
+
+## Developing
+
+To add a new npm dependency:
+```
+npm install <package> --save[-dev]
+```
+
+Use `--save` or `--save-dev` at your discretion: the former is for packages that get bundled and delivered with the app, the latter for those used only in development to produce the app.
+
+When bundling a new dependency with the app, make sure it's included in `index.html` and, if necessary, under `external` in `webpack.config.js`.
 
 ## Building and deploying
 
@@ -26,6 +37,8 @@ webpack
 After that, just open `index.html` in your browser.
 
 ## TODO
-- Install Bower and use it for front end dependencies (probably including the React and ReactDOM JS files currently being imported to `index.html` from `node_modules/`).
+- Consider configuring Webpack to automatically generate `index.html` using the [html-webpack-plugin](https://www.npmjs.com/package/html-webpack-plugin).
+- Look into using Bower or Yarn for front end dependencies (probably including the React and ReactDOM JS files currently being imported to `index.html` from `node_modules/`).
 - Install Sass (using npm) and configure Webpack to transpile it for us. (This will require a Sass loader for Webpack.)
+- Figure out how to do a production build, i.e. create a package containing minified versions of only what is needed to run the app.
 - Write the app and stuff!
