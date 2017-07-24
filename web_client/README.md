@@ -44,6 +44,5 @@ After that, just open `index.html` in your browser.
 ## TODO
 - Consider configuring Webpack to automatically generate `index.html` using the [html-webpack-plugin](https://www.npmjs.com/package/html-webpack-plugin).
 - Look into using Bower or Yarn for front end dependencies (probably including the React and ReactDOM JS files currently being imported to `index.html` from `node_modules/`).
-- Install Sass (using npm) and configure Webpack to transpile it for us. (This will require a Sass loader for Webpack.)
 - Figure out how to do a production build, i.e. create a package containing minified versions of only what is needed to run the app (see [here](https://stackoverflow.com/a/31228568/490396) and [here](https://github.com/webpack/webpack/issues/615#issuecomment-65867995) and [here](https://github.com/webpack-contrib/sass-loader#in-production) for starters).
 - Write the app and stuff!
