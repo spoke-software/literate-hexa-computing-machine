@@ -21,6 +21,11 @@ npm run dev
 ```
 
 After that, just open `testClient.html` in your browser, click connect, and you can start sending messages!
+NOTE: If you use npm run dev or run
+```
+npm run openTestClient
+```
+the testClient will open in your browser automagically.
 
 ## TODO
 - Figure out the database we want to use, find ORM/typings

@@ -5,7 +5,8 @@
   "main": "./src/server.ts",
   "scripts": {
     "start": "tsc && node ./dist/server.js",
-    "dev": "tsc-watch --outDir ./dist --onSuccess \"npm run start\"",
+    "dev": "npm run openTestClient && tsc-watch --outDir ./dist --onSuccess \"npm run start\"",
+    "openTestClient": "node ./src/dev_tools/openTestClient.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

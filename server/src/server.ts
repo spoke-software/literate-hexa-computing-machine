@@ -6,8 +6,8 @@ let server = new WebSocketServer({ port: port });
 
 server.on('connection', ws => {
     ws.on('message', message => {
-        ws.send(message + " back at'cha!");
-        console.log("Received: \"" + message + "\" - echoing it back.");
+        ws.send(message + ' back at\'cha!');
+        console.log('Received: "' + message + '" - echoing it back.');
     });
 });
 
