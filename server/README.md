@@ -1,12 +1,12 @@
 # Web server back end
 
-Currently this is just the starter server code from [this tutorial](https://www.codeproject.com/Articles/871622/Writing-a-Chat-Server-using-Node-js-TypeScript-and). Do please replace the code with the real thing (and delete this line)!
-
 ## Setting up
 Run this in the `server` directory to populate `node_modules/` with sweet, sweet dependencies:
 ```
 npm install
 ```
+
+You must also set the environment property "MONGO_URI". The URI is pinned in the discord channel. See [here for more info.](https://nodejs.org/api/process.html#process_process_env)
 
 ## Building and deploying
 
@@ -28,6 +28,6 @@ npm run openTestClient
 the testClient will open in your browser automagically.
 
 ## TODO
-- Figure out the database we want to use, find ORM/typings
+- Figure out the data model...
 - Figure out ruleset (document in wiki!)
 - Write the app and stuff!
