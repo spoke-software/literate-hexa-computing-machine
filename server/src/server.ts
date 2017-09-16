@@ -1,7 +1,8 @@
 import * as WebSocket from "ws";
-import * as mongoose from 'mongoose';
+import * as mongoose from "mongoose";
+import * as bluebird from "bluebird";
 
-import {WsController} from "./controllers/wsController";
+import { WsController } from "./controllers/wsController";
 
 /*
  * Initialize db 
@@ -11,9 +12,11 @@ mongoose.connect(mongoURI, {
     useMongoClient: true
 });
 var db = mongoose.connection;
-db.on("error", console.error.bind(console, 'MongoDB Connection error:'));
+db.on("error", console.error.bind(console, "MongoDB Connection error:"));
+// Use bluebird promises - mongoose promise lib is deprecated ):
+(<any>mongoose).Promise = bluebird;
 
-db.once("open", function() {
+db.once("open", function () {
     /*
     * Initialize ws server
     */
@@ -25,7 +28,7 @@ db.once("open", function() {
     * Initialize ws controller and set to handle incoming ws connections
     */
     let wsController = new WsController();
-    server.on('connection', wsController.onConnection.bind(wsController));
+    server.on("connection", wsController.onConnection.bind(wsController));
 
-    console.log('WS Server is running on port', port);
+    console.log("WS Server is running on port", port);
 });

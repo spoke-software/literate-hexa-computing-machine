@@ -1,13 +1,13 @@
-import {Model, model} from "mongoose";
+import { Model, model } from "mongoose";
 
-import {gameSchema} from "./schemas/game";
-import {IGameDocument} from "./documents/game";
+import { gameSchema } from "./schemas/game";
+import { IGameDocument } from "./documents/game";
 
 /*
  * Extend the base Model so we can have a static create function (since we cannot provide additional constructors).
  * Implementation is done in the schema.
  */
-interface IGameModel extends Model<IGameDocument>  {
+interface IGameModel extends Model<IGameDocument> {
     createGame(playerNames: string[]): IGameDocument;
 }
 
