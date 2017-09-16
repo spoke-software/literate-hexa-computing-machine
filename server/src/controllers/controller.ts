@@ -1,3 +1,5 @@
+import * as bluebird from "bluebird";
+
 import { Game } from "../models/game";
 import { IGameDocument } from "../models/documents/game";
 
@@ -5,6 +7,23 @@ import { IGameDocument } from "../models/documents/game";
  * This will provide all interaction with games in the database that other front end facing controllers will extend
  */
 export class Controller {
+    static readonly MIN_NUM_TILES_TO_DRAW = 1;
+    static readonly MAX_NUM_TILES_TO_DRAW = 6;
+
+    drawHand(gameId: number, player: string): bluebird<string[]> {
+        return Game.findOne({ gameId: gameId })
+            .exec()
+            .then(function onFulfill(game: IGameDocument) {
+                let numTilesToDraw = Math.floor((Math.random() * (Controller.MAX_NUM_TILES_TO_DRAW - Controller.MIN_NUM_TILES_TO_DRAW + 1))
+                    + Controller.MIN_NUM_TILES_TO_DRAW);
+
+                return game.drawHand(player, numTilesToDraw);
+            })
+            .catch(function onReject(error) {
+                console.log(`Error giving player ${player} a hand in game ${gameId}:`, error);
+                return bluebird.resolve([]);
+            });
+    }
 
     createGame(playerList: string[]) {
         return Game.createGame(playerList)
@@ -14,7 +33,7 @@ export class Controller {
                 return game.gameId;
             })
             .catch(function onReject(error): number {
-                console.log(`Error creating game: `, error);
+                console.log("Error creating game:", error);
                 return -1;
             });
     }

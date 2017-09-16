@@ -16,14 +16,23 @@ export class WsController extends Controller {
                     this.wsCreateGame(ws, messageJSON.createGame.players);
                 } else if (messageJSON.deleteGame) {
                     this.wsDeleteGame(ws, messageJSON.deleteGame);
+                } else if (messageJSON.drawHand) {
+                    this.wsDrawHand(ws, messageJSON.drawHand.gameId, messageJSON.drawHand.player);
                 } else {
                     console.log("Need to implement ", messageJSON);
                 }
             } catch (e) {
                 ws.send(message + " back at'cha!");
-                console.log(`Failed to parse: '${message}' - echoing it back.`);
+                console.log(`Failed to parse: '${message}' - echoing it back.`, e);
             }
         });
+    }
+
+    wsDrawHand(ws: WebSocket, gameId: number, player: string) {
+        super.drawHand(gameId, player)
+            .then(function onFullfil(hand) {
+                ws.send("{\"hand\": " + hand + "}");
+            });
     }
 
     wsCreateGame(ws: WebSocket, playerList: string[]) {
@@ -46,6 +55,13 @@ export class WsController extends Controller {
 }
 
 /* Test messages here, cause I'm lazy...
+{
+    "drawHand": {
+        "gameId": 3,
+        "player": "Will"
+    }
+}
+
 {
     "createGame": {
         "players": ["Will", "Sean", "Jason"]
