@@ -2,7 +2,10 @@ import { Schema, connection } from "mongoose";
 import * as autoIncrement from "mongoose-auto-increment";
 
 import { Game } from "../game";
+import { Player } from "../player";
 import { IGameDocument } from "../documents/game";
+import { IPlayerDocument } from "../documents/player";
+import { playerSchema } from "./player";
 import { getArrayOfStartingTiles } from "../../utils/utils";
 
 /*
@@ -11,8 +14,7 @@ import { getArrayOfStartingTiles } from "../../utils/utils";
  */
 export var gameSchema: Schema = new Schema({
     gameId: Number,
-    playerList: [String],
-    handsList: [[String]],
+    playerList: [playerSchema],
     tileBag: [String],
     board: [[String]]
 });
@@ -27,27 +29,23 @@ gameSchema.plugin(autoIncrement.plugin, {
 
 gameSchema.statics.createGame = function (playerNames: string[]): IGameDocument {
     let game = new Game();
-    game.playerList = playerNames;
+    game.playerList = [];
+    playerNames.forEach(function (name) {
+        game.playerList.push(Player.createPlayer(name));
+    });
     game.tileBag = getArrayOfStartingTiles();
     return game;
 };
 
-gameSchema.methods.playerInGame = function (player: string) {
-    return this.playerList.indexOf(player) !== -1;
+gameSchema.methods.getPlayer = function (playerName: string): IPlayerDocument {
+    return (<IPlayerDocument[]>this.playerList).find(player => player.name === playerName) || null;
 }
 
-gameSchema.methods.playerHasHand = function (player: string) {
-    return this.handsList.length !== 0 && //if no one has hands
-        this.handsList[this.playerList.indexOf(player)] && //if this player never had a hand before but was after someone who does..
-        this.handsList[this.playerList.indexOf(player)][0] !== null && //if this player never had a hand before but was before someone who does....
-        this.handsList[this.playerList.indexOf(player)].length !== 0;
-}
+gameSchema.methods.drawHand = function (playerName: string, numTiles: number) {
+    let player = <IPlayerDocument>this.getPlayer(playerName);
 
-gameSchema.methods.drawHand = function (player: string, numTiles: number) {
-    if (!this.playerInGame(player)) {
+    if (player === null) {
         throw new Error("Player is not in the game.");
-    } else if (this.playerHasHand(player)) {
-        throw new Error("Player already has a hand.");
     }
 
     if (numTiles > this.tileBag.length) {
@@ -61,10 +59,12 @@ gameSchema.methods.drawHand = function (player: string, numTiles: number) {
         tiles.push(tile[0]);
     }
 
-    this.handsList[this.playerList.indexOf(player)] = tiles;
-    this.markModified('handsList'); // needed because of array or something...?
+    let expectedHand = player.addToHand(tiles);
 
     return (<IGameDocument>this).save().then(function onFullfil(game: IGameDocument) {
-        return game.handsList[game.playerList.indexOf(player)];
+        if (expectedHand != player.hand) {
+            console.warn(`Warning: Player ${player} in game ${game} should have hand ${expectedHand} but has hand ${player.hand}`);
+        }
+        return player.hand;
     });
 }

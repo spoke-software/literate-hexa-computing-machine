@@ -21,7 +21,7 @@ export class Controller {
             })
             .catch(function onReject(error) {
                 console.log(`Error giving player ${player} a hand in game ${gameId}:`, error);
-                return bluebird.resolve([]);
+                return bluebird.reject("Unable to draw hand - please try again later");
             });
     }
 

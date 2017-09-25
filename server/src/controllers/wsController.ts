@@ -32,6 +32,9 @@ export class WsController extends Controller {
         super.drawHand(gameId, player)
             .then(function onFullfil(hand) {
                 ws.send("{\"hand\": " + hand + "}");
+            })
+            .catch(function onReject(error) {
+                ws.send(JSON.stringify(error));
             });
     }
 
@@ -39,6 +42,9 @@ export class WsController extends Controller {
         super.createGame(playerList)
             .then(function onFullfil(gameId: number) {
                 ws.send("{\"gameId\": " + gameId + "}");
+            })
+            .catch(function onReject(error) {
+                ws.send(JSON.stringify(error));
             });
     }
 
@@ -47,8 +53,8 @@ export class WsController extends Controller {
             .then(function res(response) {
                 ws.send(JSON.stringify(response));
             })
-            .catch(function rej(reason) {
-                ws.send(JSON.stringify(reason));
+            .catch(function onReject(error) {
+                ws.send(JSON.stringify(error));
             });
     }
 
@@ -57,7 +63,7 @@ export class WsController extends Controller {
 /* Test messages here, cause I'm lazy...
 {
     "drawHand": {
-        "gameId": 3,
+        "gameId": 5,
         "player": "Will"
     }
 }

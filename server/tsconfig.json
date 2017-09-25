@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "experimentalDecorators": true, //allows us to unit test easier
         "outDir": "dist",
         "sourceMap": true,
         "noImplicitAny": true,
@@ -7,6 +8,7 @@
         "target": "es6"
     },
     "include": [
-        "./src/**/*"
+        "./src/**/*",
+        "./tst/**/*"
     ]
 }
