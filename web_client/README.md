@@ -1,15 +1,8 @@
 # Web client front end
 
-Currently this is just the "Hello, World!" app from [this tutorial](https://www.typescriptlang.org/docs/handbook/react-&-webpack.html). Do please replace the code with the real thing (and delete this line)!
-
-**Note:** When adding new TypeScript files, make sure you use the `.tsx` ending to enable [TypeScript's JSX support](https://www.typescriptlang.org/docs/handbook/jsx.html).
+Currently this is just the "Hello, World!" app from [this tutorial](https://github.com/Microsoft/TypeScript-Vue-Starter). Do please replace the code with the real thing (and delete this line)!
 
 ## Setting up
-
-Make sure you have Webpack installed globally:
-```
-npm install -g webpack
-```
 
 Run this in the `web_client` directory to populate `node_modules/` with sweet, sweet dependencies:
 ```
@@ -29,20 +22,23 @@ When bundling a new dependency with the app, make sure it's included in `index.h
 
 ## Building and deploying
 
-Transmogrificating TypeScript/React files from `src/` into JS files in `dist/` is as simple as running this in the `web_client` directory:
+In `package.json` you'll find npm scripts for transmogrificating Vue/TypeScript/Sass files from `src/` into JS files in `dist/`.
+
+Run them like this:
 ```
-webpack
+npm run build
 ```
 
-Or to have it **w**atch the filesystem for changes:
+This one will watch the filesystem for changes:
 ```
-webpack -w
+npm run dev
 ```
 
 After that, just open `index.html` in your browser.
 
 ## TODO
 - Consider configuring Webpack to automatically generate `index.html` using the [html-webpack-plugin](https://www.npmjs.com/package/html-webpack-plugin).
-- Look into using Bower or Yarn for front end dependencies (probably including the React and ReactDOM JS files currently being imported to `index.html` from `node_modules/`).
+- Look into using Bower or Yarn for front end dependencies (probably including the Vue and Vuex JS files currently being imported to `index.html` from `node_modules/`).
 - Figure out how to do a production build, i.e. create a package containing minified versions of only what is needed to run the app (see [here](https://stackoverflow.com/a/31228568/490396) and [here](https://github.com/webpack/webpack/issues/615#issuecomment-65867995) and [here](https://github.com/webpack-contrib/sass-loader#in-production) for starters).
+- Install [Vuex](https://github.com/vuejs/vuex) for state management (like Redux).
 - Write the app and stuff!

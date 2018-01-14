@@ -2,10 +2,11 @@
     "compilerOptions": {
         "outDir": "./dist/",
         "sourceMap": true,
-        "noImplicitAny": true,
-        "module": "commonjs",
+        "strict": true,
+        "module": "es2015",
+        "moduleResolution": "node",
         "target": "es5",
-        "jsx": "react"
+        "experimentalDecorators": true
     },
     "include": [
         "./src/**/*"
