@@ -1,7 +1,5 @@
 # Web client front end
 
-Currently this is just the "Hello, World!" app from [this tutorial](https://github.com/Microsoft/TypeScript-Vue-Starter). Do please replace the code with the real thing (and delete this line)!
-
 ## Setting up
 
 Run this in the `web_client` directory to populate `node_modules/` with sweet, sweet dependencies:
@@ -40,5 +38,5 @@ After that, just open `index.html` in your browser.
 - Consider configuring Webpack to automatically generate `index.html` using the [html-webpack-plugin](https://www.npmjs.com/package/html-webpack-plugin).
 - Look into using Bower or Yarn for front end dependencies (probably including the Vue and Vuex JS files currently being imported to `index.html` from `node_modules/`).
 - Figure out how to do a production build, i.e. create a package containing minified versions of only what is needed to run the app (see [here](https://stackoverflow.com/a/31228568/490396) and [here](https://github.com/webpack/webpack/issues/615#issuecomment-65867995) and [here](https://github.com/webpack-contrib/sass-loader#in-production) for starters).
-- Install [Vuex](https://github.com/vuejs/vuex) for state management (like Redux).
+- Unit tests (see [here](https://vuejs.org/v2/guide/unit-testing.html) for starters).
 - Write the app and stuff!

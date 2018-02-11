@@ -1,20 +1,17 @@
 <template>
-    <div>
-        <div class="greeting">Hello {{name}}{{exclamationMarks}}</div>
-        <button @click="decrement">-</button>
-        <button @click="increment">+</button>
-    </div>
+    <!-- TODO a bordered box for each element in the hand array -->
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 
 export default Vue.extend({
+    // TODO This is stlil from the Hello World thingy.
     props: ['name', 'initialEnthusiasm'],
     data() {
         return {
             enthusiasm: this.initialEnthusiasm,
-        }
+        };
     },
     methods: {
         increment() { this.enthusiasm++; },
@@ -28,7 +25,7 @@ export default Vue.extend({
         exclamationMarks(): string {
             return Array(this.enthusiasm + 1).join('!');
         }
-    }
+    },
 });
 </script>
 
@@ -36,3 +33,5 @@ export default Vue.extend({
 .greeting
     font-size: 20px
 </style>
+
+
