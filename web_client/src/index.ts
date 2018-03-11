@@ -10,24 +10,43 @@ socket.onmessage = (message) => store.dispatch('handleMessage', message);
 // The single state tree: one object for all application-level state
 const store = new Vuex.Store({
     state: {
-        // TODO How should these be initialized?
         board: [],
-        currentPlayer: {},
+        currentPlayer: '',
+        gameList: [],
+        currentGameId: 0,
     },
+    // Mutations are called with commit, can modify state (nothing else can), and must be synchronous
     mutations: {
         selectPlayer(state, payload) {
-            // TODO How should we access the WebSocket?
-            // TODO Get player with given name (needs to be implemented on the back end)
-            socket.send({
-                name: payload.name,
-            });
+            console.debug(`Selecting player ${payload.name}!`);
+            state.currentPlayer = payload.name;
+
+            console.debug(`Getting ${payload.name}'s games!`);
+            socket.send(JSON.stringify({
+                retrieveGames: {
+                    player: payload.name,
+                },
+            }));
+        },
+        selectGame(state, payload) {
+            state.currentGameId = payload.gameId;
+        },
+        updateGameList(state, payload) {
+            state.gameList = payload.games;
         },
     },
+    // Actions are called with dispatch and can commit mutations and perform asynchronous operations
+    // (including dispatching other actions)
     actions: {
-        handleMessage(message) {
-            // TODO Use this action (or something) to commit updates received from the websocket
+        handleMessage(context, payload) {
             console.debug('Message received!');
-            console.debug(message);
+            console.debug(payload.data);
+            const message = JSON.parse(payload.data);
+
+            // Reponse to a retrieveGames request
+            if (message.games) {
+                context.commit('updateGameList', message);
+            }
         },
     },
 });
@@ -39,6 +58,6 @@ const vue = new Vue({
         AppComponent,
     },
     template: `
-        <app-component>
+        <app-component></app-component>
     `,
 });

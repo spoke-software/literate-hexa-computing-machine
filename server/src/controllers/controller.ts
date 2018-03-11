@@ -10,21 +10,6 @@ export class Controller {
     static readonly MIN_NUM_TILES_TO_DRAW = 1;
     static readonly MAX_NUM_TILES_TO_DRAW = 6;
 
-    drawHand(gameId: number, player: string): bluebird<string[]> {
-        return Game.findOne({ gameId: gameId })
-            .exec()
-            .then(function onFulfill(game: IGameDocument) {
-                let numTilesToDraw = Math.floor((Math.random() * (Controller.MAX_NUM_TILES_TO_DRAW - Controller.MIN_NUM_TILES_TO_DRAW + 1))
-                    + Controller.MIN_NUM_TILES_TO_DRAW);
-
-                return game.drawHand(player, numTilesToDraw);
-            })
-            .catch(function onReject(error) {
-                console.log(`Error giving player ${player} a hand in game ${gameId}:`, error);
-                return bluebird.reject("Unable to draw hand - please try again later");
-            });
-    }
-
     createGame(playerList: string[]) {
         return Game.createGame(playerList)
             .save()
@@ -35,6 +20,21 @@ export class Controller {
             .catch(function onReject(error): number {
                 console.log("Error creating game:", error);
                 return -1;
+            });
+    }
+
+    retrieveGames(player: string): bluebird<IGameDocument[]> {
+        // Find each game whose playerList array contains a player with the given name
+        return Game.find({ 'playerList.name': player })
+            // Only return metadata (e.g. to be used for game selection)
+            .select('gameId playerList')
+            .exec()
+            .then(function onFulfill(gameData: IGameDocument[]) {
+                return gameData;
+            })
+            .catch(function onReject(error: any) {
+                console.log(`Error retrieving games for player ${player}:`, error.toString());
+                return bluebird.reject("Unable to retrieve games - please try again later");
             });
     }
 
@@ -52,4 +52,20 @@ export class Controller {
                 return false;
             });
     }
+
+    drawHand(gameId: number, player: string): bluebird<string[]> {
+        return Game.findOne({ gameId: gameId })
+            .exec()
+            .then(function onFulfill(game: IGameDocument) {
+                let numTilesToDraw = Math.floor((Math.random() * (Controller.MAX_NUM_TILES_TO_DRAW - Controller.MIN_NUM_TILES_TO_DRAW + 1))
+                    + Controller.MIN_NUM_TILES_TO_DRAW);
+
+                return game.drawHand(player, numTilesToDraw);
+            })
+            .catch(function onReject(error) {
+                console.log(`Error giving player ${player} a hand in game ${gameId}:`, error);
+                return bluebird.reject("Unable to draw hand - please try again later");
+            });
+    }
+
 }

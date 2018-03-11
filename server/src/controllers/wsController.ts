@@ -12,8 +12,12 @@ export class WsController extends Controller {
         ws.on("message", message => {
             try {
                 let messageJSON = JSON.parse(message.toString());
+                console.debug("messageJSON");
+                console.debug(messageJSON);
                 if (messageJSON.createGame) {
                     this.wsCreateGame(ws, messageJSON.createGame.players);
+                } else if (messageJSON.retrieveGames) {
+                    this.wsRetrieveGames(ws, messageJSON.retrieveGames.player);
                 } else if (messageJSON.deleteGame) {
                     this.wsDeleteGame(ws, messageJSON.deleteGame);
                 } else if (messageJSON.drawHand) {
@@ -28,20 +32,20 @@ export class WsController extends Controller {
         });
     }
 
-    wsDrawHand(ws: WebSocket, gameId: number, player: string) {
-        super.drawHand(gameId, player)
-            .then(function onFullfil(hand) {
-                ws.send("{\"hand\": " + hand + "}");
+    wsCreateGame(ws: WebSocket, playerList: string[]) {
+        super.createGame(playerList)
+            .then(function onFullfil(gameId: number) {
+                ws.send('{"gameId": ' + gameId + '}');
             })
             .catch(function onReject(error) {
                 ws.send(JSON.stringify(error));
             });
     }
 
-    wsCreateGame(ws: WebSocket, playerList: string[]) {
-        super.createGame(playerList)
-            .then(function onFullfil(gameId: number) {
-                ws.send("{\"gameId\": " + gameId + "}");
+    wsRetrieveGames(ws: WebSocket, player: string) {
+        super.retrieveGames(player)
+            .then(function onFullfil(games) {
+                ws.send(JSON.stringify({ games }));
             })
             .catch(function onReject(error) {
                 ws.send(JSON.stringify(error));
@@ -58,16 +62,19 @@ export class WsController extends Controller {
             });
     }
 
+    wsDrawHand(ws: WebSocket, gameId: number, player: string) {
+        super.drawHand(gameId, player)
+            .then(function onFullfil(hand) {
+                ws.send('{"hand": ' + hand + '}');
+            })
+            .catch(function onReject(error) {
+                ws.send(JSON.stringify(error));
+            });
+    }
+
 }
 
 /* Test messages here, cause I'm lazy...
-{
-    "drawHand": {
-        "gameId": 5,
-        "player": "Will"
-    }
-}
-
 {
     "createGame": {
         "players": ["Will", "Sean", "Jason"]
@@ -75,6 +82,19 @@ export class WsController extends Controller {
 }
 
 {
+    "retrieveGames": {
+        "player": "Sean"
+    }
+}
+
+{
     "deleteGame": 2
+}
+
+{
+    "drawHand": {
+        "gameId": 5,
+        "player": "Will"
+    }
 }
 */

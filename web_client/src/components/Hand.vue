@@ -6,7 +6,7 @@
 import Vue from "vue";
 
 export default Vue.extend({
-    // TODO This is stlil from the Hello World thingy.
+    // TODO This is still from the Hello World thingy.
     props: ['name', 'initialEnthusiasm'],
     data() {
         return {

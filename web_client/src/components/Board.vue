@@ -1,35 +1,22 @@
 <template>
     <!-- TODO a bordered box for each element in the board array -->
+    <div>
+        [insert board for game {{ currentGameId }} here]
+    </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { mapState } from 'vuex';
 
 export default Vue.extend({
-    props: ['name', 'initialEnthusiasm'],
-    data() {
-        return {
-            enthusiasm: this.initialEnthusiasm,
-        };
-    },
-    methods: {
-        increment() { this.enthusiasm++; },
-        decrement() {
-            if (this.enthusiasm > 1) {
-                this.enthusiasm--;
-            }
-        },
-    },
-    computed: {
-        exclamationMarks(): string {
-            return Array(this.enthusiasm + 1).join('!');
-        }
-    },
+    computed: mapState([
+        'currentPlayer',
+        'currentGameId',
+    ]),
 });
 </script>
 
 <style lang="sass">
-.greeting
-    font-size: 20px
 </style>
 
